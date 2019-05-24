@@ -96,3 +96,46 @@ class TestBoggle(unittest.TestCase):
             others = list(grid)
             others.remove(pos)
             self.assertListEqual(sorted(neighbours[pos]), sorted(others))
+    
+    def test_converting_a_path_to_a_word(self):
+        '''
+        Ensure that paths can be converted to words
+        '''
+        # Make random grid for now, we just want to turn letters into a string and make a word, regardless of whether the word exists
+        grid = boggle.make_grid(2, 2)
+        # We can access any letter in the grid by its coordinates, in this case it's 0,0
+        # Ensures the function returns the same string as we manually select in the game
+        oneLetterWord = boggle.path_to_word(grid, [(0,0)])
+        twoLetterWord = boggle.path_to_word(grid, [(0,0), (1,1)])
+        self.assertEqual(oneLetterWord, grid[(0,0)])
+        self.assertEqual(twoLetterWord, grid[(0,0)] + grid[(1,1)])
+    
+    def test_search_grid_for_words(self):
+        '''
+        Ensure that certain patterns can be found in a path_to_word
+        '''
+        # Create a mock grid with letters A, B, C and D so we can control our letters
+        grid = {(0,0): 'A', (0,1): 'B', (1,0): 'C', (1,1): 'D',}
+        # Define a dictionary of three words - two in the grid and should be found, one not in the grid and should not be found
+        twoLetterWord = 'AB'
+        threeLetterWord = 'ABC'
+        notThereWord = 'EEE'
+        dictionary = [twoLetterWord, threeLetterWord, notThereWord]
+        
+        foundWords = boggle.search(grid, dictionary)
+        
+        self.assertTrue(twoLetterWord in foundWords)
+        self.assertTrue(threeLetterWord in foundWords)
+        self.assertTrue(notThereWord not in foundWords)
+    
+    def test_load_dictionary(self):
+        '''
+        Test that the 'get_dictionary' function returns a dictionary that has
+        a length greater than 0
+        '''
+        # The file name is of a file we will create in our workspace
+        # We will get the data from a word file website
+        dictionary = boggle.get_dictionary('words.txt')
+        self.assertGreater(len(dictionary), 0)
+    
+    
