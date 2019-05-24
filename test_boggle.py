@@ -64,4 +64,35 @@ class TestBoggle(unittest.TestCase):
         for letter in grid.values():
             self.assertIn(letter, ascii_uppercase)
     
+    def test_neighbours_of_a_position(self):
+        '''
+        Ensure that a position has 8 neighbours
+        '''
+        coords = (1,2)
+        # We call functions that we will define after writing the test
+        neighbours = boggle.neighbours_of_position(coords)
+        #This takes the position of a grid and returns the 8 neighbours that it should have
+        self.assertIn((0, 1), neighbours)
+        self.assertIn((0, 2), neighbours)
+        self.assertIn((0, 3), neighbours)
+        self.assertIn((1, 1), neighbours)
+        self.assertIn((1, 3), neighbours)
+        self.assertIn((2, 1), neighbours)
+        self.assertIn((2, 2), neighbours)
+        self.assertIn((2, 3), neighbours)
     
+    def test_all_grid_neighbours(self):
+        '''
+        Ensure that all of the grid positions have neighbours (this accounts for the edge and corner pieces)
+        In (2,2) grid, every position touches every other position, so the neighbours of any position are other three positions in the grid
+        '''
+        grid = boggle.make_grid(2,2)
+        # We get all the neighbours for the grid - dictionary where key is the position but value is list of neighbouring positions
+        neighbours = boggle.all_grid_neighbours(grid)
+        # Asserts the length of the neighbours dictionary, which should be equal to the grid length
+        self.assertEqual(len(neighbours), len(grid))
+        # The for loop iterates through the other positions - we create the others list, which is the full grid minus the current position
+        for pos in grid:
+            others = list(grid)
+            others.remove(pos)
+            self.assertListEqual(sorted(neighbours[pos]), sorted(others))
