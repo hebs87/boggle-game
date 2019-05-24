@@ -6,6 +6,8 @@ Then we write methods inside that class for the actual tests
 import unittest
 # Here, we import boggle, as this is where the code that we're testing resides
 import boggle
+# Here we import the ascii_uppercase function from the string library - these are the 26 ASCII uppercase characters from A-Z
+from string import ascii_uppercase
 
 '''
 SAMPLE TEST TO ENSURE THAT UNITTEST IS WORKING - THIS CAN BE DELETED ONCE THIS HAS BEEN ESTABLISHED
@@ -52,3 +54,14 @@ class TestBoggle(unittest.TestCase):
         self.assertIn((1,1), grid)
         # assertNotIn() method ensures that 2,2 is not in the grid
         self.assertNotIn((2,2), grid)
+    
+    def test_grid_is_filled_with_letters(self):
+        '''
+        Ensure that each of the coordinates in the grid contains letters
+        '''
+        grid = boggle.make_grid(2,3)
+        # Test creates a grid and then ensures that each of the characters in the test are uppercase letters
+        for letter in grid.values():
+            self.assertIn(letter, ascii_uppercase)
+    
+    
