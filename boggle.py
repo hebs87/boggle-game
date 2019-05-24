@@ -114,3 +114,24 @@ def get_dictionary(dictionary_file):
     '''
     with open(dictionary_file) as f:
         return [w.strip().upper() for w in f]
+
+def main():
+    '''
+    This is the function that will run the whole project
+    '''
+    # Generate a random board
+    grid = make_grid(3,3)
+    dictionary = get_dictionary('words.txt')
+    words = search(grid, dictionary)
+    for word in words:
+        print(word)
+    print("Found %s words" % len(words))
+
+'''
+If we simply call main(), that will be run each time we run unittest too
+We want to only run boggle.py when we actually want to run the game
+We want to ignore it when we run our tests
+This is achieved with the below code
+'''
+if __name__ == "__main__":
+    main()
