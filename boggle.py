@@ -60,6 +60,15 @@ def path_to_word(grid, path):
     # Gets list of letters for the path and joins them into a string
     return ''.join([grid[p] for p in path])
 
+'''
+def word_in_dictionary(word, dict):
+    ***This function is created after running the cProfile to isolate the method
+    that is taking the most time. In this case is was to search whether a word
+    was in the dictionary
+    CAN BE DELETED AFTER PRUNING***
+    return word in dict
+'''
+
 def search(grid, dictionary):
     '''
     Search through the paths to locate the words
@@ -72,6 +81,8 @@ def search(grid, dictionary):
     '''
     neighbours = all_grid_neighbours(grid)
     paths = []
+    # ***PRUNED CODE - UNPACK DICTIONARY TUPLE INTO THE OTHER TWO***
+    full_words, stems = dictionary
     
     def do_search(path):
         '''
@@ -93,8 +104,17 @@ def search(grid, dictionary):
         valid words into words and return them in a list.
         '''
         word = path_to_word(grid, path)
-        if word in dictionary:
+        '''
+        if word in dictionary: - this was the original, but changed to the below
+        After writing the word_in_dictionary() function, and we pass it
+        arguments of word and dictionary
+        if word_in_dictionary(word, dictionary):
+        ***AFTER word_in_dictionary PRUNED, THIS NEEDS TO BE MODIFIED
+        '''
+        if word in full_words:
             paths.append(path)
+        if word not in stems:
+            return
         for next_pos in neighbours[path[-1]]:
             if next_pos not in path:
                 do_search(path + [next_pos])
@@ -111,21 +131,48 @@ def search(grid, dictionary):
 def get_dictionary(dictionary_file):
     '''
     Load dictionary file
-    '''
+    Change the [] on the last line to {} instead, which ensures that the words
+    are stored in a set, rather than a list. This speeds up the run time, as
+    it is a better data structure
+    ***FINAL STEP - PRUNING***
+    Original code:
     with open(dictionary_file) as f:
-        return [w.strip().upper() for w in f]
+        return {w.strip().upper() for w in f}
+    Create a second dictionary to that contains all partial words (stems)
+    Eg. If dictionary contains the words BUS and THIS, stems dictionary would
+    contain B, BU, T, TH and THI. If the stems existed, we could do a
+    simultaneous constant time lookup, rather than linear time lookup.
+    ***Once this is done, we need to modify our search function
+    '''
+    # Creating two tuples with two sets - one set for full word, other for stems
+    full_words, stems = set(), set()
+    with open(dictionary_file) as f:
+        # We iterate over the fictionary and get the full words and add it to full_words tuple
+        for word in f:
+            word = word.strip().upper()
+            full_words.add(word)
+            
+            # Nested for loop for the stems
+            for i in range(1, len(word)):
+                stems.add(word[:i])
+    
+    # We then return the full words and stems
+    return full_words, stems
+
+def display_words(words):
+    for word in words:
+        print(word)
+    print("Found %s words" % len(words))
 
 def main():
     '''
     This is the function that will run the whole project
     '''
     # Generate a random board
-    grid = make_grid(3,3)
+    grid = make_grid(100,100)
     dictionary = get_dictionary('words.txt')
     words = search(grid, dictionary)
-    for word in words:
-        print(word)
-    print("Found %s words" % len(words))
+    display_words(words)
 
 '''
 If we simply call main(), that will be run each time we run unittest too
